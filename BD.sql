@@ -31,7 +31,7 @@ CREATE TABLE `bomba` (
   PRIMARY KEY (`idBomba`),
   KEY `fk_idTanque_idx` (`idTanque`),
   CONSTRAINT `fk_idTanque` FOREIGN KEY (`idTanque`) REFERENCES `tanque` (`idtanque`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,7 +40,7 @@ CREATE TABLE `bomba` (
 
 LOCK TABLES `bomba` WRITE;
 /*!40000 ALTER TABLE `bomba` DISABLE KEYS */;
-INSERT INTO `bomba` VALUES ('0001',200,'D001'),('0002',0,'D002'),('0003',0,'G001'),('0004',0,'G001'),('0005',0,'G002');
+INSERT INTO `bomba` VALUES ('D1',0,'D001'),('D2',0,'D001'),('D3',0,'D002'),('G1',0,'G001'),('G2',0,'G002'),('G3',0,'G002');
 /*!40000 ALTER TABLE `bomba` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -60,7 +60,7 @@ CREATE TABLE `combustivel` (
   `estoque_maximo` float DEFAULT NULL,
   PRIMARY KEY (`nomeCombustivel`),
   UNIQUE KEY `nomeCombustivel_UNIQUE` (`nomeCombustivel`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -69,7 +69,7 @@ CREATE TABLE `combustivel` (
 
 LOCK TABLES `combustivel` WRITE;
 /*!40000 ALTER TABLE `combustivel` DISABLE KEYS */;
-INSERT INTO `combustivel` VALUES ('Diesel',0.30,3,NULL,1500,NULL),('Gasolina',0.20,4,NULL,1000,NULL);
+INSERT INTO `combustivel` VALUES ('Diesel',0.20,2,0,1000,3000),('Gasolina',0.20,5,0,500,600);
 /*!40000 ALTER TABLE `combustivel` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -88,7 +88,7 @@ CREATE TABLE `declaracao` (
   `valor_litro_combustivel` float NOT NULL,
   `valor_vendido_combustivel` float NOT NULL,
   PRIMARY KEY (`idDeclaracao`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -112,9 +112,11 @@ CREATE TABLE `historicodiario` (
   `quantidade_litro` float NOT NULL,
   `nomeCombustivel` varchar(45) NOT NULL,
   `dataDiario` date NOT NULL,
+  `valor_litro` float NOT NULL,
+  `aliquota` float NOT NULL,
   `valorVenda` float NOT NULL,
   PRIMARY KEY (`idHistoricoDiario`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -123,7 +125,6 @@ CREATE TABLE `historicodiario` (
 
 LOCK TABLES `historicodiario` WRITE;
 /*!40000 ALTER TABLE `historicodiario` DISABLE KEYS */;
-INSERT INTO `historicodiario` VALUES (34,200,'Diesel','2018-10-04',200),(35,100,'Gasolina','2018-10-04',100),(36,200,'Gasolina','2018-09-29',100),(37,100,'Diesel','2018-09-29',50);
 /*!40000 ALTER TABLE `historicodiario` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -139,9 +140,9 @@ CREATE TABLE `historicomensal` (
   `nomeCombustivel` varchar(45) NOT NULL,
   `idTanque` varchar(45) NOT NULL,
   `qtd_litro_recebido` float NOT NULL,
-  `data_abastecimento` date NOT NULL,
+  `data_recebimento` date NOT NULL,
   PRIMARY KEY (`idHistoricoSemanal`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -167,7 +168,7 @@ CREATE TABLE `historicosemanal` (
   `dataSemanal` date NOT NULL,
   `valorVenda` float NOT NULL,
   PRIMARY KEY (`idHistoricoMensal`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -176,9 +177,23 @@ CREATE TABLE `historicosemanal` (
 
 LOCK TABLES `historicosemanal` WRITE;
 /*!40000 ALTER TABLE `historicosemanal` DISABLE KEYS */;
-INSERT INTO `historicosemanal` VALUES (7,200,'Diesel','2018-10-04',200),(8,100,'Gasolina','2018-10-04',100);
 /*!40000 ALTER TABLE `historicosemanal` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Temporary view structure for view `new_view`
+--
+
+DROP TABLE IF EXISTS `new_view`;
+/*!50001 DROP VIEW IF EXISTS `new_view`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8mb4;
+/*!50001 CREATE VIEW `new_view` AS SELECT 
+ 1 AS `data`,
+ 1 AS `nomeCombustivel`,
+ 1 AS `valorVenda`,
+ 1 AS `quantidade_litro`*/;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `pedido`
@@ -189,15 +204,15 @@ DROP TABLE IF EXISTS `pedido`;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `pedido` (
   `idPedido` int(11) NOT NULL AUTO_INCREMENT,
-  `data_hora` date NOT NULL,
-  `valor_litro` float NOT NULL,
-  `qtd_litro` float NOT NULL,
-  `valor_total` float NOT NULL,
+  `data` date DEFAULT NULL,
+  `valor_litro` float DEFAULT NULL,
+  `qtd_litro` float DEFAULT NULL,
+  `valor_total` float DEFAULT NULL,
   `nomeCombustivel` varchar(45) NOT NULL,
   PRIMARY KEY (`idPedido`),
   KEY `fk_nomeCombustivel_idx` (`nomeCombustivel`),
   CONSTRAINT `fk_pedido_nomeCombustivel` FOREIGN KEY (`nomeCombustivel`) REFERENCES `combustivel` (`nomecombustivel`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -218,7 +233,7 @@ UNLOCK TABLES;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `pedido_AFTER_INSERT` AFTER INSERT ON `pedido` FOR EACH ROW BEGIN
-    declare done int default 0;
+	declare done int default 0;
 	declare v_idTanque varchar(4);
     declare v_volume_maximo float;
     declare v_volume_atual float;
@@ -248,7 +263,7 @@ DELIMITER ;;
 		END IF;	
 		
         until done
-        end repeat;
+    end repeat;
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -273,7 +288,7 @@ CREATE TABLE `registrobomba` (
   PRIMARY KEY (`idRegistroBomba`),
   KEY `fk_rtbomba_idTanque_idx` (`idTanque`),
   KEY `fk_rtbomba_idBomba_idx` (`idBomba`)
-) ENGINE=InnoDB AUTO_INCREMENT=123457 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -282,7 +297,6 @@ CREATE TABLE `registrobomba` (
 
 LOCK TABLES `registrobomba` WRITE;
 /*!40000 ALTER TABLE `registrobomba` DISABLE KEYS */;
-INSERT INTO `registrobomba` VALUES (123453,'0001','2018-10-04',100,100,'D001'),(123454,'0001','2018-10-04',100,100,'D001'),(123455,'0003','2018-10-04',100,100,'G001'),(123456,'0001','2018-10-04',50,45,'D001');
 /*!40000 ALTER TABLE `registrobomba` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -299,7 +313,7 @@ CREATE TABLE `registrobombadiaria` (
   `idBomba` varchar(45) NOT NULL,
   `valorVendido` float NOT NULL,
   PRIMARY KEY (`idRegistroBombaDiaria`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -329,7 +343,7 @@ CREATE TABLE `registrotanque` (
   KEY `fk_registro_nomeCombustivel_idx` (`nomeCombustivel`),
   CONSTRAINT `fk_registro_idTanque` FOREIGN KEY (`idTanque`) REFERENCES `tanque` (`idtanque`),
   CONSTRAINT `fk_registro_nomeCombustivel` FOREIGN KEY (`nomeCombustivel`) REFERENCES `combustivel` (`nomecombustivel`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -338,7 +352,6 @@ CREATE TABLE `registrotanque` (
 
 LOCK TABLES `registrotanque` WRITE;
 /*!40000 ALTER TABLE `registrotanque` DISABLE KEYS */;
-INSERT INTO `registrotanque` VALUES (3,'2018-10-04',100,'D001','Diesel'),(4,'2018-10-04',100,'D001','Diesel'),(5,'2018-10-04',20,'D001','Diesel');
 /*!40000 ALTER TABLE `registrotanque` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -351,13 +364,13 @@ DROP TABLE IF EXISTS `tanque`;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `tanque` (
   `idTanque` varchar(4) NOT NULL,
-  `volume_maximo` float NOT NULL,
-  `volume_atual` float NOT NULL,
+  `volume_maximo` float DEFAULT NULL,
+  `volume_atual` float DEFAULT NULL,
   `nomeCombustivel` varchar(45) NOT NULL,
   PRIMARY KEY (`idTanque`),
   KEY `fk_nomeCombustivel_idx` (`nomeCombustivel`),
   CONSTRAINT `fk_nomeCombustivel` FOREIGN KEY (`nomeCombustivel`) REFERENCES `combustivel` (`nomecombustivel`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -366,7 +379,7 @@ CREATE TABLE `tanque` (
 
 LOCK TABLES `tanque` WRITE;
 /*!40000 ALTER TABLE `tanque` DISABLE KEYS */;
-INSERT INTO `tanque` VALUES ('D001',500,420,'Diesel'),('D002',300,340,'Diesel'),('G001',400,450,'Gasolina'),('G002',300,400,'Gasolina');
+INSERT INTO `tanque` VALUES ('D001',1000,0,'Diesel'),('D002',2000,0,'Diesel'),('G001',100,0,'Gasolina'),('G002',200,0,'Gasolina'),('G003',300,0,'Gasolina');
 /*!40000 ALTER TABLE `tanque` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -441,23 +454,10 @@ SET character_set_client = utf8mb4;
 /*!50001 CREATE VIEW `view_hist_diario` AS SELECT 
  1 AS `data`,
  1 AS `nomeCombustivel`,
+ 1 AS `valor_litro`,
+ 1 AS `aliquota`,
  1 AS `Valor_Diario_Venda`,
  1 AS `Volume_Total_Diario`*/;
-SET character_set_client = @saved_cs_client;
-
---
--- Temporary view structure for view `view_semanal`
---
-
-DROP TABLE IF EXISTS `view_semanal`;
-/*!50001 DROP VIEW IF EXISTS `view_semanal`*/;
-SET @saved_cs_client     = @@character_set_client;
-SET character_set_client = utf8mb4;
-/*!50001 CREATE VIEW `view_semanal` AS SELECT 
- 1 AS `data`,
- 1 AS `nomeCombustivel`,
- 1 AS `valorVenda`,
- 1 AS `quantidade_litro`*/;
 SET character_set_client = @saved_cs_client;
 
 --
@@ -479,8 +479,7 @@ SET character_set_client = @saved_cs_client;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `abastece_carro`(in p_quantidadeLitros float, in p_idBomba varchar(11))
 BEGIN
-    
-    DECLARE litros_vendidos float; #bomba
+DECLARE litros_vendidos float; #bomba
     DECLARE volumeTanque float; #volume tanque
     DECLARE v_idTanque varchar(4); #ID tanque
     DECLARE v_nomeCombustivel varchar(45);
@@ -519,7 +518,6 @@ BEGIN
          SIGNAL SQLSTATE '45000'
          SET MESSAGE_TEXT = 'A quantidade de litros retirada é menor que a de estoque no Tanque';
     END IF;
-    
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -538,30 +536,72 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `abastece_tanque`(in p_idTanque varchar(4), in p_quantidadeLitros float)
 BEGIN
-
-    DECLARE v_vol_atual float; 
+	DECLARE v_vol_atual float; 
     DECLARE v_vol_maximo float; 
     DECLARE v_nomeCombustivel varchar(45);
     
     SELECT volume_atual, volume_maximo, nomeCombustivel 
-        INTO v_vol_atual, v_vol_maximo, v_nomeCombustivel
-        FROM Tanque
-        WHERE idTanque = p_idTanque;
+		INTO v_vol_atual, v_vol_maximo, v_nomeCombustivel
+		FROM Tanque
+		WHERE idTanque = p_idTanque;
 
-    IF v_vol_atual + p_quantidadeLitros <= v_vol_maximo THEN 
-        #Seta quantidade atual do volume do tanque
+	IF v_vol_atual + p_quantidadeLitros <= v_vol_maximo THEN 
+		#Seta quantidade atual do volume do tanque
         UPDATE Tanque 
         SET volume_atual = v_vol_atual + p_quantidadeLitros
         WHERE idTanque = p_idTanque;
         #Cria Log de Registro do Tanque com data, hora e quantidade de litros abastecidos
-        INSERT RegistroTanque(`data`, `quantidade_litro`,
-                `idTanque`, `nomeCombustivel`) VALUES (curdate(), p_quantidadeLitros,
+        INSERT RegistroTanque(`data_hora`, `quantidade_litro`,
+			    `idTanque`, `nomeCombustivel`) VALUES (CURDATE(), p_quantidadeLitros,
                 p_idTanque, v_nomeCombustivel);
     ELSE
-         SIGNAL SQLSTATE '45000'
-         SET MESSAGE_TEXT = 'A quantidade de litros execede o máximo permitido para esse tanque';
+		 SIGNAL SQLSTATE '45000'
+		 SET MESSAGE_TEXT = 'A quantidade de litros execede o máximo permitido para esse tanque';
      END IF;   
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `declaracao` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `declaracao`()
+BEGIN
+	
+    Declare v_data_declaracao date;
 
+	SELECT max(data_declaracao) INTO v_data_declaracao
+    FROM Declaracao;
+    
+    SELECT concat('myvar is ', v_data_declaracao);
+    
+    If v_data_declaracao is not null then
+		insert INTO Declaracao(data_declaracao, nomeCombustivel, aliquota, 
+								valor_litro_combustivel, valor_vendido_combustivel) 
+                    SELECT curdate(), 
+                    nomeCombustivel,
+                    aliquota, valor_litro, valorVenda FROM HistoricoDiario
+                    WHERE dataDiario between v_data_declaracao and curdate();
+    else
+		insert INTO Declaracao(data_declaracao, 
+					nomeCombustivel, aliquota, 
+                    valor_litro_combustivel,
+                    valor_vendido_combustivel) 
+                    SELECT curdate(), 
+                    nomeCombustivel,
+                    aliquota, valor_litro, valorVenda 
+			   FROM HistoricoDiario;
+		
+	end if;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -584,16 +624,20 @@ BEGIN
     DECLARE c_nomeCombustivel varchar(45);
     DECLARE c_valor float;
     DECLARE c_volume float;
+    DECLARE c_valor_litro float;
+    DECLARE c_aliquota decimal(3,2);
     DECLARE i int;
     DECLARE registro cursor for
-		select nomeCombustivel, Valor_Diario_Venda, Volume_Total_Diario from view_hist_diario;
+		select nomeCombustivel, Valor_Diario_Venda, 
+			   Volume_Total_Diario, valor_litro, aliquota
+        from view_hist_diario;
 	OPEN registro;
     set i = (select count(*) from view_hist_diario);
     set c_data = current_date();
     REPEAT
-		fetch registro into c_nomeCombustivel, c_valor, c_volume;
-		insert 	into HistoricoDiario(dataDiario, quantidade_litro, nomeCombustivel, valorVenda) 
-				values(c_data, c_volume, c_nomeCombustivel, c_valor);
+		fetch registro into c_nomeCombustivel, c_valor, c_volume, c_valor_litro, c_aliquota;
+		insert 	into HistoricoDiario(dataDiario, quantidade_litro, nomeCombustivel, valorVenda, valor_litro, aliquota) 
+				values(c_data, c_volume, c_nomeCombustivel, c_valor, c_valor_litro, c_aliquota);
 		set i = i - 1;
 	until i = 0
     END REPEAT;
@@ -620,16 +664,24 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_mensal`()
 BEGIN
     
-    DECLARE v_idTanque varchar(4);
+    INSERT INTO HistoricoMensal(nomeCombustivel, idTanque, qtd_litro_recebido, data_recebimento)
+      SELECT nomeCombustivel, idTanque, SUM(quantidade_litro), data
+      FROM RegistroTanque
+      WHERE data BETWEEN (CURDATE() - INTERVAL 30 DAY) AND CURDATE(); 
+    
+    /*DECLARE v_idTanque varchar(4);
     DECLARE v_quantidade_litro float;
     DECLARE v_nomeCombustivel varchar(45);
     DECLARE v_data date;
     
-    INSERT INTO HistoricoMensal(nomeCombustivel, idTanque, qtd_litro_recebido, data_abastecimento)
-	SELECT nomeCombustivel, idTanque, SUM(quantidade_litro), data
-	FROM RegistroTanque
-	WHERE data BETWEEN (CURDATE() - INTERVAL 30 DAY) AND CURDATE()
-	Group by idTanque; 
+    SELECT data, idTanque, SUM(quantidade_litro), nomeCombustivel
+    INTO v_data, v_idTanque, v_quantidade_litro, v_nomeCombustivel
+    FROM RegistroTanque
+    WHERE data BETWEEN (CURDATE() - INTERVAL 30 DAY) AND CURDATE()
+    Group by idTanque;
+    
+    INSERT INTO HistoricoMensal(nomeCombustivel, idTanque, qtd_litro_recebido, data_recebimento) 
+    VALUES (v_nomeCombustivel, v_idTanque, v_quantidade_litro, v_data);*/
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -721,8 +773,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `verifica_estoque`()
 BEGIN
-
-    declare done int default 0;
+declare done int default 0;
     declare v_nomeCombustivel varchar(45);
     declare v_volume_total float;
     declare v_estoque_minimo float;
@@ -761,6 +812,24 @@ DELIMITER ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
+-- Final view structure for view `new_view`
+--
+
+/*!50001 DROP VIEW IF EXISTS `new_view`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `new_view` AS select curdate() AS `data`,`c`.`nomeCombustivel` AS `nomeCombustivel`,sum(`rb`.`valor_total_venda`) AS `valorVenda`,sum(`rb`.`quantidade_litro`) AS `quantidade_litro` from ((`combustivel` `c` join `tanque` `t` on((`c`.`nomeCombustivel` = `t`.`nomeCombustivel`))) join `registrobomba` `rb` on((`rb`.`idTanque` = `t`.`idTanque`))) where (`rb`.`data` between (curdate() - interval 7 day) and curdate()) group by `c`.`nomeCombustivel` */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
 -- Final view structure for view `view_hist_diario`
 --
 
@@ -773,25 +842,7 @@ DELIMITER ;
 /*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `view_hist_diario` AS select curdate() AS `data`,`c`.`nomeCombustivel` AS `nomeCombustivel`,sum(`rb`.`valor_total_venda`) AS `Valor_Diario_Venda`,sum(`rb`.`quantidade_litro`) AS `Volume_Total_Diario` from ((`combustivel` `c` join `tanque` `t` on((`c`.`nomeCombustivel` = `t`.`nomeCombustivel`))) join `registrobomba` `rb` on((`rb`.`idTanque` = `t`.`idTanque`))) where (`rb`.`data` = curdate()) group by `c`.`nomeCombustivel` */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
-
---
--- Final view structure for view `view_semanal`
---
-
-/*!50001 DROP VIEW IF EXISTS `view_semanal`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8mb4 */;
-/*!50001 SET character_set_results     = utf8mb4 */;
-/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `view_semanal` AS select curdate() AS `data`,`c`.`nomeCombustivel` AS `nomeCombustivel`,sum(`rb`.`valor_total_venda`) AS `valorVenda`,sum(`rb`.`quantidade_litro`) AS `quantidade_litro` from ((`combustivel` `c` join `tanque` `t` on((`c`.`nomeCombustivel` = `t`.`nomeCombustivel`))) join `registrobomba` `rb` on((`rb`.`idTanque` = `t`.`idTanque`))) where (`rb`.`data` between (curdate() - interval 7 day) and curdate()) group by `c`.`nomeCombustivel` */;
+/*!50001 VIEW `view_hist_diario` AS select curdate() AS `data`,`c`.`nomeCombustivel` AS `nomeCombustivel`,`c`.`valor` AS `valor_litro`,`c`.`aliquota` AS `aliquota`,sum(`rb`.`valor_total_venda`) AS `Valor_Diario_Venda`,sum(`rb`.`quantidade_litro`) AS `Volume_Total_Diario` from ((`combustivel` `c` join `tanque` `t` on((`c`.`nomeCombustivel` = `t`.`nomeCombustivel`))) join `registrobomba` `rb` on((`rb`.`idTanque` = `t`.`idTanque`))) where (`rb`.`data` = curdate()) group by `c`.`nomeCombustivel` */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -805,4 +856,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-10-04 22:37:23
+-- Dump completed on 2018-10-05 16:24:27
